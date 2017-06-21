@@ -7,7 +7,7 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 #installs (and loads) required packages if they're not already found
-list.of.packages = c("rgdal", "RPostgreSQL", "sp", "rpostgis") 
+list.of.packages = c("rgdal", "RPostgreSQL", "sp", "rpostgis", "rstudioapi") 
 new.packages = list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages) 
 lapply(list.of.packages, require, character.only=T)
@@ -16,11 +16,10 @@ lapply(list.of.packages, require, character.only=T)
 drv = dbDriver("PostgreSQL")
 
 ###Connecting to the PostGreSQL database, 
-###1st line = local, 2th = WUR-network: PROJ_test, 3th = WUR-network:  GA_SWMS_database, 4th = ElephantSQL-hosted DB (only for importing!)
+###1st line = local, 2th = WUR-network: PROJ_test, 3th = WUR-network:  GA_SWMS_database
 #con = dbConnect(drv) #simple, local host as default
-#con = dbConnect(drv, dbname ='PROJ_test', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres')
-con = dbConnect(drv, dbname ='GA_SWMS_database', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres') 
-#con = dbConnect(drv, dbname ='tymxzoju', host = 'fizzy-cherry.db.elephantsql.com', port = 5432, user = 'tymxzoju', password = '7LMq9NHppfMBcIZ9jFbq9geK2oHR1dMM') 
+con = dbConnect(drv, dbname ='PROJ_test', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres')
+#con = dbConnect(drv, dbname ='GA_SWMS_database', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres') 
 
 
 ###EXTRACT DATA FROM DATABASE###
