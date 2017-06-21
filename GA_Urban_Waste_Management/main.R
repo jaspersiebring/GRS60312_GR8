@@ -17,7 +17,7 @@ drv = dbDriver("PostgreSQL")
 
 ###Connecting to the PostGreSQL database, uncomment first line if hosted locally
 #con = dbConnect(drv) #simple, local host as default
-con = dbConnect(drv, dbname ='PROJ_test', host = 'D0146435', port = 5432, user = "postgres", password = 'postgres')
+con = dbConnect(drv, dbname ='GA_SWMS_database', host = 'D0146435', port = 5432, user = "postgres", password = 'postgres')
 
 
 ###EXTRACT DATA FROM DATABASE###
