@@ -18,7 +18,7 @@ drv = dbDriver("PostgreSQL")
 ###Connecting to the PostGreSQL database, 
 ###1st line = local, 2th = WUR-network: PROJ_test, 3th = WUR-network:  GA_SWMS_database
 #con = dbConnect(drv) #simple, local host as default
-con = dbConnect(drv, dbname ='PROJ_test', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres')
+#con = dbConnect(drv, dbname ='PROJ_test', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres')
 #con = dbConnect(drv, dbname ='GA_SWMS_database', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres') 
 
 
@@ -41,19 +41,18 @@ pgInsert(con, name=c("workset333","drains_table"), data.obj= drains, geom = "the
 
 
 ###RAW SQL QUERIES###
-#You can use the db_query/fetch/etc family to apply raw SQL queries
-db_query = 'select * from workset333.tbl_workset;'
-
-sql_result = dbGetQuery(con, db_query)
+#split up over three functions: 
+#   dbGetQuery(con, sql_string) #basic interactive use (use only for simple table select statements)
+#   dbExecute(con, sql_string) #interactive use, i.e. will return objects (use for more complex spatial queries) (sendstatement/getaffectedrows/clearresult in one function)
+#   dbSendQuery(con, sql_string) #only submits and executes the query (use for PGROUTING and SQL scripts)
 
 
 #examples of POSTGRESQL queries
-##
-##
-## shp2pgsql -I -s <SRID> <PATH/TO/SHAPEFILE> <SCHEMA>.<DBTABLE> | psql -U postgres -d <DBNAME>
+##sql_string = 'select * from workset333.tbl_streets;'
+##sql_result = dbGetQuery(con, db_query)
 
 
 #disconnect connection
 dbDisconnect(con)
 
-#writeOGR(network, dsn = './Export', driver = 'ESRI Shapefile', layer = 'network_layer')
+
