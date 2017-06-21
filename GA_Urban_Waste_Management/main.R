@@ -3,14 +3,19 @@
 
 #20th of June 2017
 
-#Automatically sets your working directory to the location of this main.R script
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-
 #installs (and loads) required packages if they're not already found
 list.of.packages = c("rgdal", "RPostgreSQL", "sp", "rpostgis", "rstudioapi") 
 new.packages = list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages) 
 lapply(list.of.packages, require, character.only=T)
+
+#Automatically sets your working directory to the location of this main.R script
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
+
+
+
+
 
 #Setting the driver that'll connect to the PostgreSQL database
 drv = dbDriver("PostgreSQL")
