@@ -15,9 +15,12 @@ lapply(list.of.packages, require, character.only=T)
 #Setting the driver that'll connect to the PostgreSQL database
 drv = dbDriver("PostgreSQL")
 
-###Connecting to the PostGreSQL database, uncomment first line if hosted locally
+###Connecting to the PostGreSQL database, 
+###1st line = local, 2th = WUR-network: PROJ_test, 3th = WUR-network:  GA_SWMS_database, 4th = ElephantSQL-hosted DB (only for importing!)
 #con = dbConnect(drv) #simple, local host as default
-con = dbConnect(drv, dbname ='GA_SWMS_database', host = 'D0146435', port = 5432, user = "postgres", password = 'postgres')
+#con = dbConnect(drv, dbname ='PROJ_test', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres')
+con = dbConnect(drv, dbname ='GA_SWMS_database', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres') 
+#con = dbConnect(drv, dbname ='tymxzoju', host = 'fizzy-cherry.db.elephantsql.com', port = 5432, user = 'tymxzoju', password = '7LMq9NHppfMBcIZ9jFbq9geK2oHR1dMM') 
 
 
 ###EXTRACT DATA FROM DATABASE###
