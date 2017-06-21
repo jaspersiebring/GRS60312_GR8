@@ -17,7 +17,7 @@ drv = dbDriver("PostgreSQL")
 
 ###Connecting to the PostGreSQL database, 
 ###1st line = local, 2th = WUR-network: PROJ_test, 3th = WUR-network:  GA_SWMS_database
-#con = dbConnect(drv, user = 'postgres', password = 'postgres', dbname = '') #localhost
+#con = dbConnect(drv, user = 'postgres', password = 'postgres', dbname = 'GA_SWMS_database') #localhost
 #con = dbConnect(drv, dbname ='PROJ_test', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres')
 #con = dbConnect(drv, dbname ='GA_SWMS_database', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres') 
 
