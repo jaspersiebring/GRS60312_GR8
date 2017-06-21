@@ -1,0 +1,10 @@
+External Server (ElephantSQL) details:
+ 
+name    GA_Urban_Waste_Management
+Host    fizzy-cherry.db.elephantsql.com
+Port    5432
+ 
+M_DB    tymxzoju
+User    tymxzoju
+PWD    7LMq9NHppfMBcIZ9jFbq9geK2oHR1dMM
+ 
