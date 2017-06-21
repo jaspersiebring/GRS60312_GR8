@@ -12,6 +12,10 @@ lapply(list.of.packages, require, character.only=T)
 #Automatically sets your working directory to the location of this main.R script
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
+#Load your functions here (R scripts)
+source('R/database_initialization.R')
+
+
 
 #Setting the driver that'll connect to the PostgreSQL database
 drv = dbDriver("PostgreSQL")
