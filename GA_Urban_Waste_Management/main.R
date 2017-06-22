@@ -2,7 +2,7 @@
 #Team Garbage
 
 #21st of June 2017
-
+ 
 #installs (and loads) required packages if they're not already found
 list.of.packages = c("rgdal", "RPostgreSQL", "sp", "rpostgis", "rstudioapi") 
 new.packages = list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
