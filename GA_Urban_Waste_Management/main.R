@@ -49,6 +49,10 @@ pgInsert(con, name=c("public","sdf_network"), data.obj= sdf_network, geom = "the
 
 ##If you want to store any spatialdataframes:
 #writeOGR(obj, dsn = './Export', driver = 'ESRI Shapefile', layer = 'network_layer')
+  
+create_pgnetwork_and_pgvertices(con)
+
+create_pgroutes(con)
 
 #disconnect connection
 dbDisconnect(con)
