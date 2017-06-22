@@ -1,0 +1,7 @@
+Made by: Thijs
+Date: 20-6-2017
+Description: Shape with all nessecary attributes for binproperties folder, reprojected to wgs84.
+Units per attribute: 
+	Capacity; 500kg (calculated with 5000l volume, 100kg/1000l)
+	BinHouseholds; households according to CBS data of 2016, divided per neighbourhood, nearest to the bins, including households out of the project extent but only the ones inside the municipality, max radius 1000m (walking distance)
+	BinAvgAddedWaste; CBS data on 'huishoudelijk restafval' out of 2014; 226kg/inhabitant/year, converted to kg/day using BinHouseholds
