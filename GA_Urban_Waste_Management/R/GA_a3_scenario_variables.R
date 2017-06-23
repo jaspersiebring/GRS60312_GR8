@@ -15,8 +15,6 @@
   #             ; added variables for Decrease_BinAvgAddedWaste and Factor_BinCapacity
   #             ; included test by getting back table
 
-library('RPostgreSQL')
-
 ##Creating data frame of the scenarios
 variable_name <- c ('plastic_weight_dens','paper_weight_dens', 'residual_weight_dens', 'handling_time', 'Decrease_BinAvgAddedWaste', 'Factor_BinCapacity')
 variable_value <- c ('0.039', '0.076', '0.1', '3', '5', '1')
@@ -28,15 +26,9 @@ variable_description <- c ('[yet unused] the relative weight density of plastic 
                           'Multiplication factor on bin capacity per location i.e. number of bins per location [-]')
 scenario <- data.frame (variable_name, variable_value, variable_description)
 
-# Access database
-drv <- dbDriver("PostgreSQL")
-con <- dbConnect(drv, dbname ='SWMS_database', host = 'D0146435', port = 5432, user = "postgres", password = 'postgres')
-
 #Insert data frame to database
 pgInsert(con, name=c("public","a3_scenario_variables"), data.obj= scenario, alter.names=TRUE, overwrite = TRUE )
 
 #Test by getting back table
 scenario_test = dbReadTable(con, c("public", "a3_scenario_variables"))
 
-#Free up resources
-dbDisconnect(con)
