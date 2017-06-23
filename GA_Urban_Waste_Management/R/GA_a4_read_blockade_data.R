@@ -14,6 +14,7 @@ AllWazeData <- read.csv("./data/project/a4_WazeTrafficData.csv", header = TRUE, 
 RoadClosures <- subset(AllWazeData, linqmap_level == "5")
 
 #push dataframe to db
-pgInsert(con, name=c("public","a4_blockades"), data.obj= RoadClosures, new.id = "gid", df.geom = "geom")
+pgInsert(con, name=c("public","a4_blockades"), data.obj= RoadClosures, new.id = "gid", df.geom = c("geom", "(LineString,0)"))
+dbSendQuery(con, "SELECT UpdateGeometrySRID('a4_blockades', 'geom', 4326);" )
 
 #No srid code given, defaulted to 0
