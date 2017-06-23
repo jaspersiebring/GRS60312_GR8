@@ -16,7 +16,6 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source('R/database_initialization.R')
 
 
-
 #Setting the driver that'll connect to the PostgreSQL database
 drv = dbDriver("PostgreSQL")
 
@@ -49,10 +48,14 @@ pgInsert(con, name=c("public","sdf_network"), data.obj= sdf_network, geom = "the
 
 ##If you want to store any spatialdataframes:
 #writeOGR(obj, dsn = './Export', driver = 'ESRI Shapefile', layer = 'network_layer')
-  
-create_pgnetwork_and_pgvertices(con)
 
-create_pgroutes(con)
+db_init(con)
+create_pgnetwork_and_pgvertices(con)
+create_pgroutes(con, c(8519, 8719))
+create_pgroutes(con, c(9034, 2035))
+create_pgroutes(con, c(6867, 8150))
+create_pgroutes(con, c(7339, 8664))
+
 
 #disconnect connection
 dbDisconnect(con)

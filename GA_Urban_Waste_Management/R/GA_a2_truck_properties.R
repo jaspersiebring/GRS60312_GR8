@@ -11,11 +11,6 @@
 ##Organization: Wageningen University UR
 
 
-#load the packages
-library('RPostgreSQL')
-library('sp')
-library ('rpostgis')
-
 #creating data frame
 truck_license_plate <- c('NLGF421X','NLGF422X','NLGF423X','NLGF424X','NLGF425X')
 truck_type <- c('Kinshofer','Kinshofer','Kinshofer','Kinshofer','Kinshofer')
@@ -32,12 +27,6 @@ xy_df <- data.frame(x,y)
 
 coordinates <- data.matrix(xy_df)
 
-
-# Database connection
-drv <- dbDriver("PostgreSQL")
-con <- dbConnect(drv, dbname ='SWMS_database', host = 'D0146435', port = 5432, user = "postgres", password = 'postgres')
-
-
 #Insert spatial data frame to database
 
 TruckProperties_Geometry <- SpatialPointsDataFrame(coords = coordinates, data = TruckProperties,
@@ -46,9 +35,6 @@ TruckProperties_Geometry <- SpatialPointsDataFrame(coords = coordinates, data = 
 pgInsert(con, name=c("public","a2_truck_properties"), data.obj= TruckProperties_Geometry, geom = "the_geom", new.id = "gid")
 
 
-
-# Free up resources
-dbDisconnect(con)
 
 
 
