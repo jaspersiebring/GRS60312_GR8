@@ -20,7 +20,7 @@ d <- dbGetQuery(con, "UPDATE pgnetwork
                       WHERE id IN 
                         (SELECT DISTINCT pgnetwork.id
                         FROM a4_blockades  
-                        LEFT JOIN pgnetwork ON ST_DFullyWithin(a4_blockades.geom, pgnetwork.the_geom, 0.0001));")
+                        LEFT JOIN pgnetwork ON ST_DFullyWithin(a4_blockades.geom, pgnetwork.the_geom, 0.0001));") 
 
 
 
