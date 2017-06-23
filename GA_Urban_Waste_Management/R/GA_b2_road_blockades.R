@@ -17,16 +17,16 @@ dbSendQuery(con, "UPDATE pgnetwork SET blockage = '0'")
 #spatial join on which roads will be blocked using ST_DWithin
 d <- dbGetQuery(con, "UPDATE pgnetwork
                       SET blockage = '1'
-                      WHERE id IN 
-                        (SELECT DISTINCT pgnetwork.id
-                        FROM a4_blockades  
-                        LEFT JOIN pgnetwork ON ST_DFullyWithin(a4_blockades.geom, pgnetwork.the_geom, 0.0001));") 
+                      WHERE gid IN 
+                        (SELECT DISTINCT pgnetwork.gid
+                      FROM pgnetwork
+                      INNER JOIN a4_blockades ON ST_DFullyWithin(pgnetwork.the_geom, a4_blockades.geom, 0.00008));") 
 
+d <- dbGetQuery(con, "SELECT *
+                      FROM a4_blockades INNER JOIN a4_blockades
+                      ON ;")
 
-
-
-
-
+explain <- d
 
 
 
@@ -88,5 +88,9 @@ f <- dbGetQuery(con, "SELECT *
                       FROM a4_blockades  
                       LEFT JOIN pgnetwork ON ST_DFullyWithin(a4_blockades.geom, pgnetwork.the_geom, 0.0001);") #273 obs of 29 var, but joined pgnetwork table is NA
 
-#changed geometrytype of blockades data
+#changed geometrytype of tables to 'geometry'and attributes names
+
+f <- dbGetQuery(con, "SELECT *
+                      FROM a4_blockades  
+                      LEFT JOIN pgnetwork ON ST_DFullyWithin(a4_blockades.geom, pgnetwork.the_geom, 100);")
 
