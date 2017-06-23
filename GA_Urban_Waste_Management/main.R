@@ -51,7 +51,7 @@ pgInsert(con, name=c("public","sdf_network"), data.obj= sdf_network, geom = "the
 
 db_init(con)
 create_pgnetwork_and_pgvertices(con)
-create_pgroutes(con, c(8519, 8719))
+pgr_dijkstra_route(con, c(8519, 8719))
 create_pgroutes(con, c(9034, 2035))
 create_pgroutes(con, c(6867, 8150))
 create_pgroutes(con, c(7339, 8664))
