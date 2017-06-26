@@ -24,4 +24,4 @@ g <- dbGetQuery(con, "UPDATE pgnetwork
                       WHERE gid IN 
                         (SELECT DISTINCT pgnetwork.gid
                         FROM pgnetwork
-                        RIGHT JOIN a4_blockades_joined ON ST_within(pgnetwork.the_geom, a4_blockades_joined.st_union));") 
+                        RIGHT JOIN a4_blockades_joined ON ST_within(pgnetwork.the_geom, a4_blockades_joined.st_union));")  
