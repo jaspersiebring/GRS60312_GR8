@@ -25,10 +25,21 @@ create_pgnetwork_and_pgvertices = function(con){
   dbSendQuery(con, "ALTER TABLE public.tbl_workset RENAME TO pgnetwork;")
   dbSendQuery(con, "ALTER TABLE public.tbl_workset_vertices_pgr RENAME TO pgnetwork_vertices_pgr;")
   
-  #Adds the blockage boolean to the network  table
+  #Adds the blockage boolean to the network table and binid to vertices table
+  dbSendQuery(con, "ALTER TABLE public.pgnetwork_vertices_pgr ADD column binid integer;")
   dbSendQuery(con, "ALTER TABLE public.pgnetwork ADD column blockage boolean;")
+  
+  #Fixes cost and reverse cost measurements
+  dbSendQuery(con, "ALTER TABLE public.pgnetwork ADD column cost float8;
+                    ALTER TABLE public.pgnetwork ADD column rcost float8;")
+  dbSendQuery(con, "UPDATE public.pgnetwork SET cost = st_length(public.pgnetwork.the_geom::geography);")
+  dbSendQuery(con, "UPDATE public.pgnetwork SET cost = -1 WHERE direction = '-';")
+  dbSendQuery(con, "UPDATE public.pgnetwork SET rcost = st_length(public.pgnetwork.the_geom::geography);")
+  dbSendQuery(con, "UPDATE public.pgnetwork SET rcost = -1 WHERE direction = '+';")
 }
 
+#node_vector <- c(627, 4420)
+#dbSendQuery(con, "DROP TABLE IF EXISTS temp_route")
 
 #Calculates the shortest route between two nodes (node_vector) based on Dijkstra's algorithm and saves it as a table (pgroutes)
 create_pgroutes = function(con, node_vector){
@@ -36,9 +47,9 @@ create_pgroutes = function(con, node_vector){
   dbSendQuery(con, "CREATE TABLE IF NOT EXISTS public.pgroutes(seq int4, node int4, edge integer, cost float8, the_geom geometry, timestamp timestamptz);")
   node_source = node_vector[1]
   node_target = node_vector[2]
-  dbSendQuery(con, paste0("CREATE TABLE temp_route AS SELECT seq, id1 AS node, id2 AS edge, cost, the_geom, now() date ",
-                          "FROM pgr_dijkstra('SELECT gid AS ID, source, target, st_length(the_geom) AS cost FROM public.pgnetwork', ",
-                          node_source, ", ", node_target, ", false, false) as di",
+  dbSendQuery(con, paste0("CREATE TABLE temp_route AS SELECT seq, id1 AS node, id2 AS edge, di.cost, the_geom, now() date ",
+                          "FROM pgr_dijkstra('SELECT gid AS ID, source, target, cost, rcost AS reverse_cost FROM pgnetwork WHERE NOT blockage', ",
+                          node_source, ", ", node_target, ", true, true) as di",
                           " JOIN public.pgnetwork",
                           " ON di.id2 = public.pgnetwork.gid"))
   dbSendQuery(con, "INSERT INTO pgroutes SELECT * FROM temp_route;")
