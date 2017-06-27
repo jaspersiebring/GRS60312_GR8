@@ -1,13 +1,11 @@
-##Script name :GA_b2_road_blockades.R
-##Description :This script contains the (spatial) data frame of bin properties in Smart Waste Management System.
-  #The output of this script is a table which becomes the project source for further analysis
-  #The table is loaded to the central database using a connection to geodatabase server
+##Script name : GA_b2_road_blockades.R
+##Description : Joins the Waze network data to the Here network, transpones boolean
 ##Packages    : RPostgreSQL, sp, rpostgis
 ##Output table: a1_bin_properties
-##Attribute   : point geometry, "bin_address", "bin_id", "bin_inhabitants", "bin_capacity", "bin_avg_added_waste"
+##Attribute   : pgnetwork, SET blockage = "1"
 ##Database    : SWMS_database
-##Creator     : Amy Gex
-##Date        : June 22, 2017
+##Creator     : Thijs van Loon
+##Date        : June 27, 2017
 ##Organization: Wageningen University UR
 
 #open all roads; boolean to blockage = 0
@@ -24,4 +22,4 @@ g <- dbGetQuery(con, "UPDATE pgnetwork
                       WHERE gid IN 
                         (SELECT DISTINCT pgnetwork.gid
                         FROM pgnetwork
-                        RIGHT JOIN a4_blockades_joined ON ST_within(pgnetwork.the_geom, a4_blockades_joined.st_union));")  
+                        RIGHT JOIN a4_blockades_joined ON ST_within(pgnetwork.the_geom, a4_blockades_joined.st_union));")
