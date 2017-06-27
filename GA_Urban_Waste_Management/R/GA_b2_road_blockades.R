@@ -23,3 +23,4 @@ g <- dbGetQuery(con, "UPDATE pgnetwork
                         (SELECT DISTINCT pgnetwork.gid
                         FROM pgnetwork
                         RIGHT JOIN a4_blockades_joined ON ST_within(pgnetwork.the_geom, a4_blockades_joined.st_union));")
+#git gui change
