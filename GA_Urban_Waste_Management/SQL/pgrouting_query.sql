@@ -39,13 +39,13 @@
 
 
 ---ACTUAL MYROUTE CALC
--- create table myroute as SELECT seq, id1 AS node, id2 AS edge, cost, the_geom
---   FROM pgr_dijkstra(
---     'SELECT gid AS ID, source, target, st_length(the_geom) AS cost FROM public.tbl_workset',
---     3000, 2000, false, false
---   ) as di
---   JOIN public.tbl_workset
---   ON di.id2 = public.tbl_workset.gid
+create table myroute as SELECT seq, id1 AS node, id2 AS edge, cost, the_geom
+  FROM pgr_dijkstra(
+    'SELECT gid AS ID, source, target, st_length(the_geom) AS cost FROM pgnetwork',
+    3000, 2000, false, false
+  ) as di
+  JOIN pgnetwork
+  ON di.id2 = pgnetwork.gid
 
 --Try it using pgnetwork
 

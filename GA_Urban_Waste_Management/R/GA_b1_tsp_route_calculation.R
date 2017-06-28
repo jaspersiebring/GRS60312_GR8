@@ -25,50 +25,48 @@ pgr_dijkstra_route = function(con, node_vector){
   dbSendQuery(con, "DROP TABLE IF EXISTS temp_route")
 }
 
-##CREATION OF SOURCE NODE
-# public.a2_truck_properties = SOURCE
-# SELECT ST_AsText(ST_ClosestPoint(pt,line)) AS cp_pt_line,
-# ST_AsText(ST_ClosestPoint(line,pt)) As cp_line_pt
-# FROM (SELECT 'POINT(100 100)'::geometry As pt,
-#       'LINESTRING (20 80, 98 190, 110 180, 50 75 )'::geometry As line
-# ) As foo;
 
-pgr_tsp_route = function(con)
 
-  "pgr_tsp(sql text, start_id integer);"
 
-SELECT dmatrix, ids from pgr_makeDistanceMatrix('SELECT id, x, y FROM vertex_table');
+
+pgr_tsp_route = function(con){
+  
+  #Creates the main route_table called tsp_routes
+  dbSendQuery(con, "CREATE TABLE IF NOT EXISTS tsp_routes(node int4, edge bigint, d_agg_cost float8, parent_id bigint, length float8, the_geom geometry);")
+  
+  #Calculates the order of nodes, i.e. bins, so these have to be change (paste0) and creates pairs of nodes
+  eucl_order = dbGetQuery(con, "(SELECT node from pgr_eucledianTSP($$SELECT id, st_X(the_geom) AS x, st_Y(the_geom) AS y FROM pgnetwork_vertices_pgr WHERE id IN (4363, 9185, 345, 4421, 4488, 448)$$, 
+                          start_id := 9185, max_processing_time := 100, randomize := false));")
+  
+  x = eucl_order$node
+  x = x[1:(length(x)-1)]
+  y = eucl_order$node
+  y = y[2:length(y)]
+  pairs = cbind(x, y)
+  
+  for (i in 1:length(pairs[,1])){ 
+    source = pairs[i,][1] 
+    target = pairs[i,][2]
+    
+    #Drops table temp_result just in case
+    dbSendQuery(con, "DROP TABLE IF EXISTS temp_result;")
+    
+    #Create route_segments
+    dbSendQuery(con, paste0("CREATE TABLE temp_result AS SELECT seq, path_seq, node::integer, edge, agg_cost AS d_agg_cost FROM pgr_dijkstra('SELECT gid AS id, source, target, cost, rcost FROM pgnetwork', ", source, ", ", target, ", FALSE);"))
+    dbSendQuery(con, "DROP TABLE IF EXISTS route_seg;")
+    dbSendQuery(con, "CREATE TABLE route_seg AS SELECT node, edge, d_agg_cost, parent_id, length, the_geom FROM temp_result AS di JOIN public.pgnetwork ON di.edge = pgnetwork.gid;")
+    dbSendQuery(con, "INSERT INTO tsp_routes SELECT * FROM route_seg;")
+    dbSendQuery(con, "DROP TABLE IF EXISTS route_seg;")
+  }
+  dbSendQuery(con, "ALTER TABLE tsp_routes ADD column id bigserial;")
+}
+  
+
+
+
+
+
+
 
   
-  
 
-#Spaghetti code for the re-noded network and other planned tasks:
-  
-#Analyses the network (needs both vertices and network) for gaps, intersections and dead ends 
-######RUN ME##sp_analysis = dbGetQuery(con, "SELECT pgr_analyzegraph('public.pgnetwork', 0.001, the_geom:='the_geom', id:='gid', source:='source', target:='target');")
-#If analysis has shown that a new network is needed, this is execute and initially called public.tbl_workset.noded
-#temp_sql_result = dbExecute(con, "SELECT pgr_nodenetwork('public.tbl_workset', 0.001, 'gid', 'the_geom', 'noded');")
-
-#You would still need to join the old network columns to this new network (left join, old.id > new.id
-#join while it still exists, gets deleted at the end of this script
-#Using the 'new' network to create topology
-#temp_sql_result = dbExecute(con, "SELECT pgr_createtopology('public.tbl_workset_noded', 0.001);")
-
-#Analyse the new network
-#sp_analysis = dbGetQuery(con, "SELECT pgr_analyzegraph('public.tbl_workset_noded', 0.001, the_geom:='the_geom', id:='id', source:='source', target:='target');")
-
-#Checks whether the network is build up of multiline objects and changes it to singleline segments if that's the case (required for topology)
-#chck_multiline = dbGetQuery(con, "SELECT COUNT(CASE WHEN ST_NumGeometries(the_geom) > 1 THEN 1 END) AS multi, COUNT(the_geom) AS total FROM public.tbl_workset;")
-#if (chck_multiline$multi == 0){
-#dbSendQuery(con, "ALTER TABLE public.tbl_workset ALTER COLUMN the_geom TYPE geometry(LineString, 4326) USING ST_GeometryN(the_geom, 1);")} 
-
-
-##Extremely important, won't work otherwise
-#   --CHANGE DATATYPES
-#   --ALTER TABLE public.pgnetwork ALTER COLUMN the_geom TYPE geometry(LineString, 4326) USING ST_GeometryN(the_geom, 1); 
-#   --ALTER TABLE public.pgnetwork ALTER COLUMN source TYPE int4;
-#   --ALTER TABLE public.pgnetwork ALTER COLUMN target TYPE int4;
-
-#comparison_id = function(db_name){ 
-#comparing the id's of the noded workset (that doesn't have the old data)
-#SELECT old_id, sub_id FROM project.tbl_workset_noded ORDER BY old_id, sub_id;

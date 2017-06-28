@@ -14,7 +14,7 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 
 #Load your functions here (R scripts)
 source('R/database_initialization.R')
-
+source('R/GA_b1_tsp_route_calculation.R')
 
 #Setting the driver that'll connect to the PostgreSQL database
 drv = dbDriver("PostgreSQL")
@@ -50,12 +50,17 @@ pgInsert(con, name=c("public","sdf_network"), data.obj= sdf_network, geom = "the
 #writeOGR(obj, dsn = './Export', driver = 'ESRI Shapefile', layer = 'network_layer')
 
 db_init(con)
+
 create_pgnetwork_and_pgvertices(con)
+
+#actual function that calculates the route
+pgr_tsp_route(con)
+
+
 pgr_dijkstra_route(con, c(8519, 8719))
 create_pgroutes(con, c(9034, 2035))
 create_pgroutes(con, c(6867, 8150))
 create_pgroutes(con, c(7339, 8664))
-
 
 #disconnect connection
 dbDisconnect(con)
