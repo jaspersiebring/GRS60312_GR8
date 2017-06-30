@@ -16,7 +16,7 @@
 #             ; included test by getting back table
 
 
-variables <- function(con, plastic_weight_dens, paper_weight_dens, residual_weight_dens, handling_time, Decrease_BinAvgAddedWaste, Factor_BinCapacity){
+scenario_variables <- function(con, plastic_weight_dens, paper_weight_dens, residual_weight_dens, handling_time, Decrease_BinAvgAddedWaste, Factor_BinCapacity){
   ##Creating data frame of the scenarios
   variable_name <- c ('plastic_weight_dens','paper_weight_dens', 'residual_weight_dens', 'handling_time', 'Decrease_BinAvgAddedWaste', 'Factor_BinCapacity')
   variable_value <- c (plastic_weight_dens ,paper_weight_dens, residual_weight_dens, handling_time, Decrease_BinAvgAddedWaste, Factor_BinCapacity)
@@ -29,7 +29,4 @@ variables <- function(con, plastic_weight_dens, paper_weight_dens, residual_weig
   scenario <- data.frame (variable_name, variable_value, variable_description)
   #Insert data frame to database
   pgInsert(con, name=c("public","a3_scenario_variables"), data.obj= scenario, alter.names=TRUE, overwrite = TRUE )
-  #Test by getting back table
-  scenario_test = dbReadTable(con, c("public", "a3_scenario_variables"))
-  
 }

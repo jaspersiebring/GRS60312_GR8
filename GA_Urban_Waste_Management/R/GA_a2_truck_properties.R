@@ -10,7 +10,7 @@
 ##Date        : June 21, 2017
 ##Organization: Wageningen University UR
 
-truck_properties_table <- function(con, licenceplate, type, capacity, speed, emission){
+truck_initilization <- function(con, licenceplate, type, capacity, speed, emission){
   #creating data frame
   truck_license_plate <- c(licenceplate)
   truck_type <- c(type)

@@ -33,7 +33,10 @@ drv = dbDriver("PostgreSQL")
 #con = dbConnect(drv, user = 'postgres', password = 'postgres', dbname = '')
 con = dbConnect(drv, dbname ='SWMS_database', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres') 
 
-## FUNCTIONS TO INITIALIZE DATABASE AND TABLES, RUN ONLY ONCE ! ##
+
+
+
+#### FUNCTIONS TO INITIALIZE DATABASE AND TABLES, RUN ONLY ONCE ! ##
 
 #Sets initial DB architecture, unpacks, relocates and renames Jewel data 
 db_initilization(con)
@@ -44,9 +47,15 @@ network_initilization(con)
 #Imports the bin shapefile containing location/capacity/avg_added_waste/no. of users
 bin_initilization(con)
 
-function2 <- truck_properties_table(con, 'NLGF421X', 'Kinshofer', 12000, 15, 200)
-function3 <- variables(con, 0.039, 0.076, 0.1, 3, 40, 1)
-function4 <- readBlockadeWaze(con) 
+#Creates a (spatial) truck_table with modular attributes and exports it to the DB  
+truck_initilization(con, 'NLGF421X', 'Kinshofer', 12000, 15, 200)
+
+#Sets scenario variables to be used for the route calculation (plastic_weight_dens, paper_weight_dens, residual_weight_dens, handling_time, Decrease_BinAvgAddedWaste, Factor_BinCapacity)
+scenario_variables(con, 0.039, 0.076, 0.1, 3, 40, 1)
+
+#Reads and exports the 
+readBlockadeWaze(con) 
+
 function5 <- initialize_bin_filling(con)
 
 
