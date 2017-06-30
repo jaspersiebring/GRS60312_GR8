@@ -26,17 +26,24 @@ pgr_dijkstra_route = function(con, node_vector){
 }
 
 
-
-
-
 pgr_tsp_route = function(con){
+  #Checks what nodes to visit based on boolean in pgnetwork_vertices_pgr and truck_start node
+  visit_nodes = dbGetQuery(con, "SELECT id AS node FROM pgnetwork_vertices_pgr where binid = 1;")
+  start_id = dbGetQuery(con, "SELECT node FROM a2_truck_properties;")
+  visit_nodes = append(visit_nodes[[1]], start_id$node)
+  
+  #Creates a usable SQL string from bin input
+  sql = "("
+  for (i in 1:length(visit_nodes)){
+    sql = paste0(sql, paste0(as.character(visit_nodes[[i]]), ", "))}
+  sql = substr(sql, 1, (nchar(sql) -2)) 
+  sql = paste0(sql, ")")
   
   #Creates the main route_table called tsp_routes
   dbSendQuery(con, "CREATE TABLE IF NOT EXISTS tsp_routes(node int4, edge bigint, d_agg_cost float8, parent_id bigint, length float8, the_geom geometry);")
   
   #Calculates the order of nodes, i.e. bins, so these have to be change (paste0) and creates pairs of nodes
-  eucl_order = dbGetQuery(con, "(SELECT node from pgr_eucledianTSP($$SELECT id, st_X(the_geom) AS x, st_Y(the_geom) AS y FROM pgnetwork_vertices_pgr WHERE id IN (4363, 9185, 345, 4421, 4488, 448)$$, 
-                          start_id := 9185, max_processing_time := 100, randomize := false));")
+  eucl_order = dbGetQuery(con, paste0("(SELECT node from pgr_eucledianTSP($$SELECT id, st_X(the_geom) AS x, st_Y(the_geom) AS y FROM pgnetwork_vertices_pgr WHERE id IN ", sql, "$$, start_id := ", start_id, ", max_processing_time := 100, randomize := false));"))
   
   x = eucl_order$node
   x = x[1:(length(x)-1)]
@@ -52,18 +59,16 @@ pgr_tsp_route = function(con){
     dbSendQuery(con, "DROP TABLE IF EXISTS temp_result;")
     
     #Create route_segments
-    dbSendQuery(con, paste0("CREATE TABLE temp_result AS SELECT seq, path_seq, node::integer, edge, agg_cost AS d_agg_cost FROM pgr_dijkstra('SELECT gid AS id, source, target, cost, rcost FROM pgnetwork', ", source, ", ", target, ", FALSE);"))
+    dbSendQuery(con, paste0("CREATE TABLE temp_result AS SELECT seq, path_seq, node::integer, edge, agg_cost AS d_agg_cost FROM pgr_dijkstra('SELECT gid AS id, source, target, cost, rcost FROM pgnetwork WHERE NOT blockage', ", source, ", ", target, ", FALSE);"))
     dbSendQuery(con, "DROP TABLE IF EXISTS route_seg;")
     dbSendQuery(con, "CREATE TABLE route_seg AS SELECT node, edge, d_agg_cost, parent_id, length, the_geom FROM temp_result AS di JOIN public.pgnetwork ON di.edge = pgnetwork.gid;")
     dbSendQuery(con, "INSERT INTO tsp_routes SELECT * FROM route_seg;")
     dbSendQuery(con, "DROP TABLE IF EXISTS route_seg;")
+    dbSendQuery(con, "DROP TABLE IF EXISTS temp_result;")
+    
   }
-  dbSendQuery(con, "ALTER TABLE tsp_routes ADD COLUMN IF NOT EXISTS  id bigserial;")
+  dbSendQuery(con, "ALTER TABLE tsp_routes ADD COLUMN id bigserial;")
 }
-  
-
-
-
 
 
 

@@ -11,8 +11,10 @@
 initialize_bin_filling <- function(con){
   #Calculate bin filling percentage
   fillper = runif(12, 1, 100)
-  #Create initial bin filling table, binid's coming from shapefile (can be improved by connecting with bin_properties table)
-  binid <- c(34879, 34892, 34902, 34919, 34920, 34922, 34923, 34927, 34941, 34963, 34971, 34976)
+  #Create initial bin filling table, binid's coming from the DB
+  binid = dbGetQuery(con, "SELECT bin_id FROM a1_bin_properties;")
+    
+  #binid <- c(34879, 34892, 34902, 34919, 34920, 34922, 34923, 34927, 34941, 34963, 34971, 34976)
   timestamp = as.POSIXlt(c('2017-01-01 8:00:00')) 
   addedwaste = c(0)
   fillpercentage = c(fillper)

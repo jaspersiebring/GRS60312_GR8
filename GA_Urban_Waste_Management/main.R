@@ -35,7 +35,8 @@ con = dbConnect(drv, dbname ='SWMS_database', host = 'D0146435', port = 5432, us
 
 
 
-
+#######################
+#######################
 #### FUNCTIONS TO INITIALIZE DATABASE AND TABLES, RUN ONLY ONCE ! ##
 
 #Sets initial DB architecture, unpacks, relocates and renames Jewel data 
@@ -53,10 +54,15 @@ truck_initilization(con, 'NLGF421X', 'Kinshofer', 12000, 15, 200)
 #Sets scenario variables to be used for the route calculation (plastic_weight_dens, paper_weight_dens, residual_weight_dens, handling_time, Decrease_BinAvgAddedWaste, Factor_BinCapacity)
 scenario_variables(con, 0.039, 0.076, 0.1, 3, 40, 1)
 
-#Reads and exports the 
+#Reads and processes the Waze blockade data (and exports it to the DB)  
 readBlockadeWaze(con) 
 
-function5 <- initialize_bin_filling(con)
+#Creates a bin_fill table where the bins have randomly been filled (with random amount up to a certain point) to resemble a normal (start) situation 
+initialize_bin_filling(con)
+
+#######################
+#######################
+
 
 
 
@@ -66,10 +72,15 @@ timestep_of_binfilling_hours <- 72
 timestep_of_collecting_bins_after_last_update <- 0.25
 SD_factor <- 0.1
 
+
+
 ## FUNCTIONS TO RUN APPLICATION ##
-function6 <- roadBlockades(con)
+
+#Updates the boolean in pgnetwork that indicates whether a road is blocked or not
+check_road_blockades(con)
 
 function7 <- read_data1(con, bin_capacity, timestep_of_binfilling_hours, SD_factor)
+
 AvgAddedWaste <- function7[[1]]
 sel_wastedec <- function7[[2]]
 bin_cap <- function7[[3]]
@@ -86,7 +97,16 @@ function10 <- collect_bins(BinData, bin_cap, capacity_truck)
 
 function11 <- empty_bins(function10, timestep_of_collecting_bins_after_last_update) # result of function 10 is list of bins which will be emptied
 
-function12 <- store_empty_bins_in_network(function10, BinData, con) # result of function 10 is list of bins which will be emptied
+#Updates boolean in pgnetwork_vertices_pgr to indicate what bin has to be emptied at what nodes 
+store_empty_bins_in_network(function10, BinData, con) # result of function 10 is list of bins which will be emptied
+
+
+#Calculate the route for the (to be emptied) bins using tsp_euclidean/pgr_dijkstra
+pgr_tsp_route(con)
+
+
+#disconnect connection
+dbDisconnect(con)
 
 
 
@@ -122,16 +142,4 @@ function12 <- store_empty_bins_in_network(function10, BinData, con) # result of 
 
 
 
-#actual function that calculates the route
-
-
-pgr_tsp_route(con)
-
-pgr_dijkstra_route(con, c(8519, 8719))
-create_pgroutes(con, c(9034, 2035))
-create_pgroutes(con, c(6867, 8150))
-create_pgroutes(con, c(7339, 8664))
-
-#disconnect connection
-dbDisconnect(con)
 

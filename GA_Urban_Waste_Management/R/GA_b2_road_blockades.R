@@ -8,7 +8,7 @@
 ##Date        : June 27, 2017
 ##Organization: Wageningen University UR
 
-roadBlockades <- function(con){
+check_road_blockades <- function(con){
   #open all roads; boolean to blockage = 0
   dbSendQuery(con, "")
   dbSendQuery(con, "UPDATE pgnetwork SET blockage = '0'")
