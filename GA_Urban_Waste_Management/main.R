@@ -68,7 +68,7 @@ initialize_bin_filling(con)
 
 ## CHANGEABLE VARIABLES ##
 bin_capacity <- 500
-timestep_of_binfilling_hours <- 72
+timestep_of_binfilling_hours <- 1
 timestep_of_collecting_bins_after_last_update <- 0.25
 SD_factor <- 0.1
 
@@ -104,6 +104,10 @@ store_empty_bins_in_network(function10, BinData, con) # result of function 10 is
 #Calculate the route for the (to be emptied) bins using tsp_euclidean/pgr_dijkstra
 pgr_tsp_route(con)
 
+
+
+
+#add all max(d_agg_cost) with unique timestamps
 
 #disconnect connection
 dbDisconnect(con)

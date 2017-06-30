@@ -10,7 +10,9 @@
 
 #Function that initializes the SWMS database (assuming a database exists, connected via 'con', and has the Jewel backup restored (workset333)  and the required extensions (postgis, postgis_topology, pgrouting, )
 db_initilization = function(con){
-  
+  #create extension pgrouting
+  #create extension postgis
+  #create extension postgis_topology
   #Still need to add the auto_restore options in db_init:
   ###pg_restore -i -h localhost -p 5432 -U postgres -d old_db -v 
   ###"/usr/local/backup/10.70.0.61.backup"
