@@ -60,13 +60,12 @@ pgr_tsp_route = function(con){
     
     #Drops table temp_result just in  case
     dbSendQuery(con, "DROP TABLE IF EXISTS temp_result CASCADE;")
+    dbSendQuery(con, "DROP TABLE IF EXISTS route_seg CASCADE;")
     
     #Create route_segments
     dbSendQuery(con, paste0("CREATE TABLE temp_result AS SELECT seq, path_seq, node::integer, edge, agg_cost AS d_agg_cost FROM pgr_dijkstra('SELECT gid AS id, source, target, cost, rcost FROM pgnetwork WHERE NOT blockage', ", source, ", ", target, ", FALSE);"))
-    
-    dbSendQuery(con, "DROP TABLE IF EXISTS route_seg CASCADE;")
-    
     dbSendQuery(con, "CREATE TABLE route_seg AS SELECT node, edge, d_agg_cost, parent_id, length, the_geom FROM temp_result AS di JOIN public.pgnetwork ON di.edge = pgnetwork.gid;")
+    
     dbSendQuery(con, "ALTER TABLE route_seg ADD COLUMN timestamp timestamptz;")
     dbSendQuery(con, "ALTER TABLE route_seg ADD COLUMN real_cost float8;")
     
@@ -75,6 +74,8 @@ pgr_tsp_route = function(con){
     costs = (costs + temp_cost)                   
     
     dbSendQuery(con, "UPDATE route_seg SET timestamp = (SELECT max(timestamp) FROM a5_bin_fill_history WHERE addedwaste = 0 AND fillpercentage = 0)")
+    dbSendQuery(con, paste0("UPDATE route_seg SET d_agg_cost = ", temp_cost))
+    
     dbSendQuery(con, "INSERT INTO temp_routes SELECT * FROM route_seg;")
     dbSendQuery(con, "DROP TABLE IF EXISTS route_seg CASCADE;")
     dbSendQuery(con, "DROP TABLE IF EXISTS temp_result CASCADE;")

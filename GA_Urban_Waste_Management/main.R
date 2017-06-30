@@ -68,7 +68,7 @@ initialize_bin_filling(con)
 
 ## CHANGEABLE VARIABLES ##
 bin_capacity <- 500
-timestep_of_binfilling_hours <- 1
+timestep_of_binfilling_hours <- 72
 timestep_of_collecting_bins_after_last_update <- 0.25
 SD_factor <- 0.1
 
@@ -78,29 +78,21 @@ SD_factor <- 0.1
 
 #Updates the boolean in pgnetwork that indicates whether a road is blocked or not
 check_road_blockades(con)
-
 function7 <- read_data1(con, bin_capacity, timestep_of_binfilling_hours, SD_factor)
-
 AvgAddedWaste <- function7[[1]]
 sel_wastedec <- function7[[2]]
 bin_cap <- function7[[3]]
 timestep <- function7[[4]]
-
 function8 = bin_filling(AvgAddedWaste)
-
 function9 <- read_data2(bin_capacity, con)
 capacity_truck <- function9[[1]]
 bin_cap <- function9[[2]]
 BinData <- function9[[3]]
-
 function10 <- collect_bins(BinData, bin_cap, capacity_truck)
-
 function11 <- empty_bins(function10, timestep_of_collecting_bins_after_last_update) # result of function 10 is list of bins which will be emptied
 
 #Updates boolean in pgnetwork_vertices_pgr to indicate what bin has to be emptied at what nodes 
 store_empty_bins_in_network(function10, BinData, con) # result of function 10 is list of bins which will be emptied
-
-
 #Calculate the route for the (to be emptied) bins using tsp_euclidean/pgr_dijkstra
 pgr_tsp_route(con)
 
