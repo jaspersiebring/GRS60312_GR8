@@ -48,7 +48,7 @@ pgr_tsp_route = function(con){
     source = pairs[i,][1] 
     target = pairs[i,][2]
     
-    #Drops table temp_result just in case
+    #Drops table temp_result just in  case
     dbSendQuery(con, "DROP TABLE IF EXISTS temp_result;")
     
     #Create route_segments
@@ -58,7 +58,7 @@ pgr_tsp_route = function(con){
     dbSendQuery(con, "INSERT INTO tsp_routes SELECT * FROM route_seg;")
     dbSendQuery(con, "DROP TABLE IF EXISTS route_seg;")
   }
-  dbSendQuery(con, "ALTER TABLE tsp_routes ADD column id bigserial;")
+  dbSendQuery(con, "ALTER TABLE tsp_routes ADD COLUMN IF NOT EXISTS  id bigserial;")
 }
   
 
