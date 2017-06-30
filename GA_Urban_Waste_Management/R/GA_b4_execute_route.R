@@ -258,18 +258,14 @@ store_empty_bins_in_network <- function (ListEmptyBins, BinData, con){
   FROM b4_bins_needs_to_be_emptied RIGHT JOIN pgnetwork_vertices_pgr 
   ON ST_DWithin(b4_bins_needs_to_be_emptied.the_geom::geometry, pgnetwork_vertices_pgr.the_geom, 0.001)
   WHERE bin_id IS NOT NULL ORDER BY bin_id, st_distance ;")
+  
+  
   # Set nodes needs to be 'emptied' to 1 if it is is 'b4_bins_to_empty' table
   g <- dbGetQuery (con, "UPDATE pgnetwork_vertices_pgr
   SET binid = '1' WHERE id IN 
-  (SELECT DISTINCT b4_linked_bins.id FROM b4_linked_bins 
-  LEFT JOIN pgnetwork_vertices_pgr ON b4_linked_bins.id = pgnetwork_vertices_pgr.id);")
+  (SELECT DISTINCT b4_bins_to_empty.id FROM b4_bins_to_empty 
+  LEFT JOIN pgnetwork_vertices_pgr ON b4_bins_to_empty.id = pgnetwork_vertices_pgr.id);")
 }
-
-
-
-
-
-
 
 
 
