@@ -35,7 +35,7 @@ read_data2 <- function(bin_capacity, con){
   capacity_truck = as.numeric(df_truck[1,4])
   
   # Link all bins to a network node (spatial query)
-  a <- dbSendQuery (con, "CREATE OR REPLACE VIEW b4_linked_bins AS
+  dbSendQuery (con, "CREATE OR REPLACE VIEW b4_linked_bins AS
 SELECT DISTINCT ON(bin_id) id, bin_id, ST_Distance(a1_bin_properties.the_geom, pgnetwork_vertices_pgr.the_geom)
 FROM a1_bin_properties RIGHT JOIN pgnetwork_vertices_pgr 
 ON ST_DWithin(a1_bin_properties.the_geom, pgnetwork_vertices_pgr.the_geom,0.001)
@@ -186,7 +186,7 @@ empty_bins <- function(ListEmptyBins, EmptyTime) {# =function10
   for (i in ListEmptyBins){
     # If bin needs to be emptied (is in list), make a subset of their data (from bin_filling_table) 
     if (i  %in% df_binfill[,1]){
-      bin <- subset(df_binfill, binid == i)
+      bin <- subset(df_binfill, df_binfill$bin_id == i)
       # Create a new dataframe which is only consisting of the last row (latest date) of the bin
       last_rows_df = tail(bin, 1)
       
@@ -244,16 +244,16 @@ store_empty_bins_in_network <- function (ListEmptyBins, BinData, con){
 }
   # Compress dataframe (only geometry and bin_id)
   bins_needs_to_be_emptied <- data.frame("bin_id" = empty_df2$bin_id, "the_geom" = empty_df2$the_geom)
-  # Drob tables which are dependent on b4_bins_needs_to_be_emptied
-  b <- dbGetQuery(con, "DROP TABLE b4_bins_needs_to_be_emptied CASCADE ;")
+  # Drop tables which are dependent on b4_bins_needs_to_be_emptied
+  dbSendQuery(con, "DROP TABLE IF EXISTS b4_bins_needs_to_be_emptied CASCADE ;")
   # Write dataframe to table on geodatabase
   write_result = dbWriteTable(con, name = 'b4_bins_needs_to_be_emptied', value = bins_needs_to_be_emptied, row.names = FALSE, alter.names = TRUE, overwrite = TRUE)
   # Assign geometry datatype to geodatabase attribute
-  c <- dbGetQuery (con, "ALTER TABLE b4_bins_needs_to_be_emptied ALTER COLUMN the_geom TYPE geometry(Point, 4326) USING ST_SetSRID(the_geom, 4326);") 
+  dbSendQuery (con, "ALTER TABLE b4_bins_needs_to_be_emptied ALTER COLUMN the_geom TYPE geometry(Point, 4326) USING ST_SetSRID(the_geom, 4326);") 
   # Update network vertices table, set everyting to false (truck doesnt need to go here)
-  d <- dbGetQuery (con, "UPDATE pgnetwork_vertices_pgr SET binid = '0';") 
+  dbSendQuery (con, "UPDATE pgnetwork_vertices_pgr SET binid = '0';") 
   # Create table based on spatial join with bins needs to be emptied --> assign this bins to nodes of the network
-  e <- dbSendQuery (con, "CREATE OR REPLACE VIEW b4_bins_to_empty AS 
+  dbSendQuery (con, "CREATE OR REPLACE VIEW b4_bins_to_empty AS 
   SELECT DISTINCT ON(bin_id) id, bin_id, ST_Distance(b4_bins_needs_to_be_emptied.the_geom, pgnetwork_vertices_pgr.the_geom)
   FROM b4_bins_needs_to_be_emptied RIGHT JOIN pgnetwork_vertices_pgr 
   ON ST_DWithin(b4_bins_needs_to_be_emptied.the_geom::geometry, pgnetwork_vertices_pgr.the_geom, 0.001)
@@ -261,7 +261,7 @@ store_empty_bins_in_network <- function (ListEmptyBins, BinData, con){
   
   
   # Set nodes needs to be 'emptied' to 1 if it is is 'b4_bins_to_empty' table
-  g <- dbGetQuery (con, "UPDATE pgnetwork_vertices_pgr
+  dbSendQuery (con, "UPDATE pgnetwork_vertices_pgr
   SET binid = '1' WHERE id IN 
   (SELECT DISTINCT b4_bins_to_empty.id FROM b4_bins_to_empty 
   LEFT JOIN pgnetwork_vertices_pgr ON b4_bins_to_empty.id = pgnetwork_vertices_pgr.id);")

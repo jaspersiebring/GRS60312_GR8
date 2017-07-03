@@ -16,7 +16,7 @@ readBlockadeWaze <- function(con){
   RoadClosures <- subset(AllWazeData, linqmap_level == "5")
   #push dataframe to db
   pgInsert(con, name=c("public","a4_blockades"), data.obj= RoadClosures, new.id = "gid", df.geom = "geom")
-  dbSendQuery(con, "SELECT UpdateGeometrySRID('a4_blockades', 'geom', 4326);" )
-  dbSendQuery(con, "SELECT UpdateGeometrySRID('pgnetwork', 'the_geom', 4326);" )
+  temp = dbGetQuery(con, "SELECT UpdateGeometrySRID('a4_blockades', 'geom', 4326);" )
+  temp = dbGetQuery(con, "SELECT UpdateGeometrySRID('pgnetwork', 'the_geom', 4326);" )
   #No srid code given, defaulted to 0 
 }

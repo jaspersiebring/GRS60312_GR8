@@ -10,22 +10,21 @@
 
 #Function that initializes the SWMS database (assuming a database exists, connected via 'con', and has the Jewel backup restored (workset333)  and the required extensions (postgis, postgis_topology, pgrouting, )
 db_initilization = function(con){
-  #create extension pgrouting
-  #create extension postgis
-  #create extension postgis_topology
-  #Still need to add the auto_restore options in db_init:
-  ###pg_restore -i -h localhost -p 5432 -U postgres -d old_db -v 
-  ###"/usr/local/backup/10.70.0.61.backup"
-  ###wmp_workset333.backup
+  #dbSendQuery(con, "CREATE EXTENSION postgis;")
+  #dbSendQuery(con, "CREATE EXTENSION postgis_topology;")
+  #dbSendQuery(con, "CREATE EXTENSION pgrouting;")
+   
   
-    sql_query = paste("ALTER TABLE workset333.tbl_streets SET SCHEMA public;",
+  
+  sql_query = paste("ALTER TABLE workset333.tbl_streets SET SCHEMA public;",
                       "ALTER TABLE workset333.tbl_navteq SET SCHEMA public;",
                       "ALTER TABLE workset333.tbl_workset SET SCHEMA public;",
-                      "ALTER SCHEMA workset333 RENAME TO jewel_data;",
-                      "SELECT UpdateGeometrySRID('tbl_workset', 'the_geom', 4326);") #SRID CHANGE MIGHT NOT WORK, CHECK FROM START TO FINISH
+                      "ALTER SCHEMA workset333 RENAME TO jewel_data;") #SRID CHANGE MIGHT NOT WORK, CHECK FROM START TO FINISH
     dbSendQuery(con, sql_query)
+    temp = dbGetQuery(con, "SELECT UpdateGeometrySRID('tbl_workset', 'the_geom', 4326);")
 }
 
+#"SELECT UpdateGeometrySRID('tbl_workset', 'the_geom', 4326);"
 
 #Function that creates the pgNetwork/vertices from Jewel' tbl_workset (network data) 
 network_initilization = function(con){

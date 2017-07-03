@@ -33,13 +33,12 @@ drv = dbDriver("PostgreSQL")
 #con = dbConnect(drv, user = 'postgres', password = 'postgres', dbname = '')
 con = dbConnect(drv, dbname ='SWMS_database', host = 'D0146435', port = 5432, user = 'postgres', password = 'postgres') 
 
-
-
 #######################
 #######################
 #### FUNCTIONS TO INITIALIZE DATABASE AND TABLES, RUN ONLY ONCE ! ##
 
-#Sets initial DB architecture, unpacks, relocates and renames Jewel data 
+#Sets initial DB architecture, unpacks, relocates and renames Jewel data
+#MAKE SURE YOUR DATABASE HAS THE REQUIRED EXTENSIONS AND JEWEL DATA
 db_initilization(con)
 
 #Creates a routable network (pgNetwork and pgNetwork_vertices_pgr) from the network dataset
@@ -71,8 +70,6 @@ bin_capacity <- 500
 timestep_of_binfilling_hours <- 72
 timestep_of_collecting_bins_after_last_update <- 0.25
 SD_factor <- 0.1
-
-
 
 ## FUNCTIONS TO RUN APPLICATION ##
 
